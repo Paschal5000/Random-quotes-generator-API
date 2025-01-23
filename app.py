@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 import random
 import json
 
@@ -13,8 +13,8 @@ quotes = load_quotes()
 
 @app.route('/')
 def home():
-    """Return a welcome message for the root URL."""
-    return "Welcome to the Quotes API!"
+    print("Home route accessed")
+    return render_template('index.html')
 
 @app.route("/api/quotes", methods=["GET"])
 def get_all_quotes():
@@ -23,7 +23,7 @@ def get_all_quotes():
 
 @app.route("/api/quote/random", methods=["GET"])
 def get_random_quote():
-    """Return a random quote."""
+    print("Random quote endpoint accessed")
     random_quote = random.choice(quotes)
     return jsonify(random_quote)
 
@@ -39,14 +39,10 @@ def get_quotes_by_category(category):
 def add_quote():
     """Add a new quote."""
     new_quote = request.json
-    if not new_quote.get("quote") or not new_quote.get("author") or not new_quote.get("category"):
-        return jsonify({"error": "Missing fields: 'quote', 'author', and 'category' are required"}), 400
-
     quotes.append(new_quote)
     with open("quotes.json", "w") as file:
-        json.dump(quotes, file, indent=4)
-    return jsonify({"message": "Quote added successfully!"}), 201
+        json.dump(quotes, file)
+    return jsonify(new_quote), 201
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
-
